@@ -1,0 +1,116 @@
+{
+  "apt_refresh": [
+    {
+      "min_version": "2.39-0ubuntu8.12",
+      "package": "libc6",
+      "reason": "UBUNTU-CVE-2026-84243: libc6 2.39-0ubuntu8.9 -> 2.39-0ubuntu8.12"
+    }
+  ],
+  "build_method": "source-rebuild-c",
+  "chain_id": 1131,
+  "dep_bumps": [],
+  "expected_residuals": [],
+  "images": [
+    {
+      "digest": "sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289",
+      "ref": "ubuntu:24.04",
+      "role": "builder"
+    },
+    {
+      "digest": "sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289",
+      "ref": "ubuntu:24.04",
+      "role": "offline_builder"
+    },
+    {
+      "digest": "sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289",
+      "ref": "ubuntu:24.04",
+      "role": "base"
+    }
+  ],
+  "mod_replaces": [],
+  "runtime_base": {
+    "kind": "chisel",
+    "provides": [
+      "ab",
+      "apachectl",
+      "checkgid",
+      "fcgistarter",
+      "htcacheclean",
+      "htdbm",
+      "htdigest",
+      "htpasswd",
+      "httpd",
+      "httxt2dbm",
+      "logresolve",
+      "rotatelogs"
+    ],
+    "rootfs_run": [
+      "sed -i -e 's/^Listen 80$/Listen 8080/' -e 's/^User daemon$/User httpd/' -e 's/^Group daemon$/Group httpd/' -e 's/^ServerAdmin you@example.com$/ServerAdmin webmaster@localhost/' -e 's/^#ServerName www.example.com:80$/ServerName localhost/' -e 's#^ErrorLog \"logs/error_log\"$#ErrorLog /proc/self/fd/2#' -e 's#^    CustomLog \"logs/access_log\" common$#    CustomLog /proc/self/fd/1 common#' \"$ROOT/opt/httpd/conf/httpd.conf\" && for l in 'Listen 8080' 'User httpd' 'Group httpd' 'ServerName localhost' 'ErrorLog /proc/self/fd/2' '    CustomLog /proc/self/fd/1 common'; do grep -qxF \"$l\" \"$ROOT/opt/httpd/conf/httpd.conf\" || { echo \"httpd.conf: '$l' not set\" >&2; exit 1; }; done",
+      "chown -R 999:999 \"$ROOT/opt/httpd/logs\""
+    ],
+    "shell": true,
+    "slice_defs": [
+      "libaprutil1t64"
+    ],
+    "slices": [
+      "libapr1t64_libs",
+      "libaprutil1t64_libs",
+      "libaprutil1t64_crypto-openssl",
+      "libaprutil1t64_dbm-db",
+      "libaprutil1t64_dbm-gdbm",
+      "libpcre2-8-0_libs",
+      "libexpat1_libs",
+      "libssl3t64_libs",
+      "libnghttp2-14_libs",
+      "zlib1g_libs",
+      "libcrypt1_libs",
+      "libgcc-s1_libs"
+    ],
+    "tools": [
+      "bash",
+      "id"
+    ]
+  },
+  "schema": "kitforge.toolchain_lock.v1",
+  "slug": "httpd",
+  "source": {
+    "build_cmds": [
+      "./configure --prefix=/opt/httpd --enable-mods-shared=most --disable-ldap --disable-authnz-ldap --enable-mpms-shared=all --with-mpm=event --enable-ssl --enable-http2 --enable-deflate --enable-pie --with-apr=/usr/bin/apr-1-config --with-apr-util=/usr/bin/apu-1-config",
+      "make -j\"$(nproc)\"",
+      "make install",
+      "rm -rf /opt/httpd/manual /opt/httpd/man",
+      "/opt/httpd/bin/httpd -v | grep -q 'Server version: Apache/2.4.71 (Unix)'"
+    ],
+    "build_packages": [
+      "build-essential",
+      "autoconf",
+      "libtool",
+      "libtool-bin",
+      "autotools-dev",
+      "python3",
+      "pkg-config",
+      "libapr1-dev",
+      "libaprutil1-dev",
+      "libpcre2-dev",
+      "libssl-dev",
+      "zlib1g-dev",
+      "libnghttp2-dev",
+      "ca-certificates"
+    ],
+    "build_system": "make",
+    "builder_image": "ubuntu:24.04",
+    "commit": "4554c7436049b6a68bfee7fbae32fc5ced666355",
+    "commit_epoch": 1794193625,
+    "install_prefix": "/opt/httpd",
+    "ref": "2.4.71",
+    "repo": "https://github.com/apache/httpd",
+    "source_date_epoch": 1795161067,
+    "source_date_epoch_basis": "release-cut",
+    "source_date_epoch_provenance": "the time release 2.4.71-CE-ubuntu24.04-r4 was cut (2026-11-20T07:51:07Z), by scripts/retarget.py --rev-bump: ReadyStack dates an image by when its release was packaged (owner 2026-11-10), recorded here once and used by every rebuild of the release; it builds upstream commit 4554c7436049, dated 2026-11-09T03:07:05Z (source.commit_epoch).",
+    "source_prep": [
+      "./buildconf --with-apr=/usr/share/apr-1.0 --with-apr-util=/usr/share/apr-1.0 && cp /usr/share/misc/config.guess /usr/share/misc/config.sub build/ && test -x configure"
+    ],
+    "vendored_deps": true
+  },
+  "version": "2.4.71"
+}

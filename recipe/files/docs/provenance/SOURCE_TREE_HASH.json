@@ -1,0 +1,9 @@
+{
+  "schema": "kitforge.source_tree_hash.v1",
+  "slug": "httpd",
+  "repo": "https://github.com/apache/httpd",
+  "ref": "2.4.71",
+  "commit": "4554c7436049b6a68bfee7fbae32fc5ced666355",
+  "tree_listing_sha256": "d036c14b10e548c79c0adfc66eb5b5601b7a1b94b3e70de58cb7620e784cb2eb",
+  "file_count": 5548
+}

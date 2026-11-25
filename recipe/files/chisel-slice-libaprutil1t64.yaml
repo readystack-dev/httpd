@@ -1,0 +1,48 @@
+# ReadyStack slice definition: chisel-releases (ubuntu-24.04) has no slice for libaprutil1t64, the Apache Portable
+# Runtime utility library Apache httpd loads. Cut from Ubuntu's own libaprutil1t64 .deb, as every canonical slice is;
+# the format and the paths follow chisel-releases' own library slices (libapr1t64.yaml). Contents of libaprutil1t64
+# 1.6.3-1.1ubuntu7.1 (noble): /usr/lib/x86_64-linux-gnu/libaprutil-1.so.0.6.3 with its .so.0 link; the drivers
+# apr-util opens at run time from /usr/lib/x86_64-linux-gnu/apr-util-1 (apr_crypto_openssl, apr_dbm_db, apr_dbm_gdbm:
+# each a -1.so with an unversioned .so link); /usr/share/doc/libaprutil1t64/{copyright,NOTICE,changelog.Debian.gz}.
+# One slice per driver, each with the library it loads (readelf), so a product takes only the drivers it uses; the
+# essentials of libs are the libraries libaprutil-1.so.0 itself loads.
+package: libaprutil1t64
+
+essential:
+  - libaprutil1t64_copyright
+
+slices:
+  libs:
+    essential:
+      - libapr1t64_libs
+      - libc6_libs
+      - libcrypt1_libs
+      - libexpat1_libs
+    contents:
+      /usr/lib/*-linux-*/libaprutil-1.so.0*:
+
+  crypto-openssl:
+    essential:
+      - libaprutil1t64_libs
+      - libssl3t64_libcrypto
+    contents:
+      /usr/lib/*-linux-*/apr-util-1/apr_crypto_openssl*.so:
+
+  dbm-db:
+    essential:
+      - libaprutil1t64_libs
+      - libdb5.3t64_libs
+    contents:
+      /usr/lib/*-linux-*/apr-util-1/apr_dbm_db*.so:
+
+  dbm-gdbm:
+    essential:
+      - libaprutil1t64_libs
+      - libgdbm6t64_libs
+    contents:
+      /usr/lib/*-linux-*/apr-util-1/apr_dbm_gdbm*.so:
+
+  copyright:
+    contents:
+      /usr/share/doc/libaprutil1t64/copyright:
+      /usr/share/doc/libaprutil1t64/NOTICE:

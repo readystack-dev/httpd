@@ -1,0 +1,6 @@
+image_manifest_digest=sha256:84f2147f2f4ad749a3ad8f2d53aeb53db12cfcafd74c0aa7a74ac25a0cc45a78
+config_digest=sha256:275d94c43985c45e9af26282505aac2825711b01541ac0999ffea56cfaf9344f
+tag=readystack/httpd:2.4.71-CE-ubuntu24.04-r4
+probe_port=8080
+probe_path=/
+probe_timeout=180

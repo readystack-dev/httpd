@@ -1,0 +1,7 @@
+#!/bin/sh
+# ReadyStack httpd: start Apache httpd in the foreground as the container's main process. A PID file left by an earlier
+# run of this container would make httpd refuse to start ("httpd (pid 1) already running"), so it is removed first, as
+# upstream's httpd-foreground does.
+set -e
+rm -f /opt/httpd/logs/httpd.pid
+exec httpd -DFOREGROUND "$@"

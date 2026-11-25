@@ -1,0 +1,117 @@
+{
+  "schema": "kitforge.build_recipe.v1",
+  "slug": "httpd",
+  "image": "readystack/httpd:2.4.71-CE-ubuntu24.04-r4",
+  "build_method": "source-rebuild-c",
+  "source": {
+    "repo": "https://github.com/apache/httpd",
+    "ref": "2.4.71",
+    "commit": "4554c7436049b6a68bfee7fbae32fc5ced666355",
+    "source_date_epoch": 1795161067,
+    "source_date_epoch_provenance": "the time release 2.4.71-CE-ubuntu24.04-r4 was cut (2026-11-20T07:51:07Z), by scripts/retarget.py --rev-bump: ReadyStack dates an image by when its release was packaged (owner 2026-11-10), recorded here once and used by every rebuild of the release; it builds upstream commit 4554c7436049, dated 2026-11-09T03:07:05Z (source.commit_epoch).",
+    "build_system": "make",
+    "builder_image": "ubuntu:24.04",
+    "build_packages": [
+      "build-essential",
+      "autoconf",
+      "libtool",
+      "libtool-bin",
+      "autotools-dev",
+      "python3",
+      "pkg-config",
+      "libapr1-dev",
+      "libaprutil1-dev",
+      "libpcre2-dev",
+      "libssl-dev",
+      "zlib1g-dev",
+      "libnghttp2-dev",
+      "ca-certificates"
+    ],
+    "source_prep": [
+      "./buildconf --with-apr=/usr/share/apr-1.0 --with-apr-util=/usr/share/apr-1.0 && cp /usr/share/misc/config.guess /usr/share/misc/config.sub build/ && test -x configure"
+    ],
+    "build_cmds": [
+      "./configure --prefix=/opt/httpd --enable-mods-shared=most --disable-ldap --disable-authnz-ldap --enable-mpms-shared=all --with-mpm=event --enable-ssl --enable-http2 --enable-deflate --enable-pie --with-apr=/usr/bin/apr-1-config --with-apr-util=/usr/bin/apu-1-config",
+      "make -j\"$(nproc)\"",
+      "make install",
+      "rm -rf /opt/httpd/manual /opt/httpd/man",
+      "/opt/httpd/bin/httpd -v | grep -q 'Server version: Apache/2.4.71 (Unix)'"
+    ],
+    "install_prefix": "/opt/httpd",
+    "vendored_deps": true,
+    "_build_note": "The git tag has no configure script: buildconf makes it in the vendor stage from Ubuntu's APR build files (/usr/share/apr-1.0/build, libapr1-dev), which do not include config.guess and config.sub, so they are copied from autotools-dev; python3 is buildconf's own requirement. The offline build runs ./configure, make and make install into /opt/httpd against the system APR (apr-1-config, apu-1-config). Measured 2026-11-08 on ubuntu:24.04: buildconf, configure, make and make install in about 70 s; `httpd -V` reports Apache/2.4.70 (Unix), APR 1.7.2, APR-UTIL 1.6.3, PCRE 10.42, event MPM; 96 modules. The manual (42 MB of HTML) and the man pages are not shipped. gcc honours SOURCE_DATE_EPOCH, so `httpd -V`'s \"Server built\" line is the source date. --disable-ldap --disable-authnz-ldap (r2, 2026-11-09): `most` built mod_ldap and mod_authnz_ldap because Ubuntu's APR-util has LDAP support, but they load libldap and liblber, which r1 never installed (`ldd` on 2.4.70-r1: libldap.so.2 => not found), so neither could be loaded there; the chiselled runtime's library check refuses a module whose library the rootfs lacks, and OpenLDAP's client library would bring GnuTLS and Cyrus SASL for two modules nobody could use.",
+    "commit_epoch": 1794193625,
+    "source_date_epoch_basis": "release-cut"
+  },
+  "binaries_from_source": null,
+  "runtime_packages": [
+    "base-files",
+    "base-passwd",
+    "bash",
+    "ca-certificates",
+    "coreutils",
+    "dash",
+    "gcc-14-base",
+    "libapr1t64",
+    "libaprutil1t64",
+    "libc6",
+    "libcrypt1",
+    "libdb5.3t64",
+    "libexpat1",
+    "libgcc-s1",
+    "libgdbm6t64",
+    "libnghttp2-14",
+    "libpcre2-8-0",
+    "libselinux1",
+    "libssl3t64",
+    "libtinfo6",
+    "libuuid1",
+    "openssl",
+    "tzdata",
+    "zlib1g"
+  ],
+  "runtime_base": {
+    "kind": "chisel",
+    "shell": true,
+    "tools": [
+      "bash",
+      "id"
+    ],
+    "slices": [
+      "libapr1t64_libs",
+      "libaprutil1t64_libs",
+      "libaprutil1t64_crypto-openssl",
+      "libaprutil1t64_dbm-db",
+      "libaprutil1t64_dbm-gdbm",
+      "libpcre2-8-0_libs",
+      "libexpat1_libs",
+      "libssl3t64_libs",
+      "libnghttp2-14_libs",
+      "zlib1g_libs",
+      "libcrypt1_libs",
+      "libgcc-s1_libs"
+    ],
+    "slice_defs": [
+      "libaprutil1t64"
+    ],
+    "provides": [
+      "ab",
+      "apachectl",
+      "checkgid",
+      "fcgistarter",
+      "htcacheclean",
+      "htdbm",
+      "htdigest",
+      "htpasswd",
+      "httpd",
+      "httxt2dbm",
+      "logresolve",
+      "rotatelogs"
+    ],
+    "rootfs_run": [
+      "sed -i -e 's/^Listen 80$/Listen 8080/' -e 's/^User daemon$/User httpd/' -e 's/^Group daemon$/Group httpd/' -e 's/^ServerAdmin you@example.com$/ServerAdmin webmaster@localhost/' -e 's/^#ServerName www.example.com:80$/ServerName localhost/' -e 's#^ErrorLog \"logs/error_log\"$#ErrorLog /proc/self/fd/2#' -e 's#^    CustomLog \"logs/access_log\" common$#    CustomLog /proc/self/fd/1 common#' \"$ROOT/opt/httpd/conf/httpd.conf\" && for l in 'Listen 8080' 'User httpd' 'Group httpd' 'ServerName localhost' 'ErrorLog /proc/self/fd/2' '    CustomLog /proc/self/fd/1 common'; do grep -qxF \"$l\" \"$ROOT/opt/httpd/conf/httpd.conf\" || { echo \"httpd.conf: '$l' not set\" >&2; exit 1; }; done",
+      "chown -R 999:999 \"$ROOT/opt/httpd/logs\""
+    ],
+    "packages": "vendored/chisel/packages.tsv"
+  }
+}
