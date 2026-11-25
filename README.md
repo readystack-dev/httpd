@@ -5,7 +5,25 @@ The offline build kit for the Docker image `readystack/httpd:2.4.71-CE-ubuntu24.
 - Release: [2.4.71-CE-ubuntu24.04-r4](https://github.com/readystack-dev/httpd/releases/tag/2.4.71-CE-ubuntu24.04-r4)
 - Image: [`docker.io/readystack/httpd:2.4.71-CE-ubuntu24.04-r4`](https://hub.docker.com/r/readystack/httpd/tags), manifest digest `sha256:84f2147f2f4ad749a3ad8f2d53aeb53db12cfcafd74c0aa7a74ac25a0cc45a78`
 - Product page: https://readystack.dev/products/httpd
+- Source and build recipe: https://readystack.dev/products/httpd/recipe
+- Build trail: https://readystack.dev/products/httpd/trail/2.4.71-CE-ubuntu24.04-r4
 - Defects: this repository's Issues (defects recorded from 25 November 2026 on) and https://readystack.dev/defects.html?product=httpd
+
+## The image
+
+Single container, Apache httpd compiled from source: the event MPM's parent process in the foreground as PID 1 with its worker processes, all as the non-root user httpd. Serves files from /opt/httpd/htdocs and, with the modules you load, proxies to backends. No database, no sidecar, no state of its own.
+
+## This release
+
+- Docker Scout policy grade at release: **A** (94%), graded 2026-11-20 with `docker scout policy` (CLI 1.26.0, docker-default configuration).
+  - Docker Scout counts 15 packages with copyleft licences (GPL, LGPL, MPL), all of them operating-system packages (it counts only packages whose licence it can read; the SBOM lists every component).
+- Signed with ReadyStack's release key (fingerprint `04daa92344a52dbc`): https://readystack.dev/keys/cosign.pub.
+- Runs as a non-root user (`httpd`).
+- Attestations on the image: an SPDX SBOM and SLSA provenance v1.
+- Rebuilt from this kit with network egress blocked on 2026-11-20; the rebuilt image digest is the published one.
+- Base: Ubuntu 24.04.
+
+The current grade, measured again every day, is on https://readystack.dev/products/httpd.
 
 Apache httpd is distributed under its upstream licence (Apache-2.0); the kit contains upstream's source under that licence, and each vendored component under its own.
 
@@ -39,3 +57,5 @@ The build trail (`ReadyStack-httpd-2.4.71-CE-ubuntu24.04-r4.trail.json`, signed 
 ## This repository
 
 `recipe/` holds the kit's recipe files (Dockerfiles, build scripts, pins) as published at https://readystack.dev/products/httpd/recipe. The complete kit is the release download. Each release is a tag here.
+
+— ReadyStack · https://readystack.dev
