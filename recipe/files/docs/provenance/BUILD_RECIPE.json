@@ -1,14 +1,14 @@
 {
   "schema": "kitforge.build_recipe.v1",
   "slug": "httpd",
-  "image": "readystack/httpd:2.4.71-CE-ubuntu24.04-r4",
+  "image": "readystack/httpd:2.4.71-CE-ubuntu24.04-r5",
   "build_method": "source-rebuild-c",
   "source": {
     "repo": "https://github.com/apache/httpd",
     "ref": "2.4.71",
     "commit": "4554c7436049b6a68bfee7fbae32fc5ced666355",
-    "source_date_epoch": 1795161067,
-    "source_date_epoch_provenance": "the time release 2.4.71-CE-ubuntu24.04-r4 was cut (2026-11-20T07:51:07Z), by scripts/retarget.py --rev-bump: ReadyStack dates an image by when its release was packaged (owner 2026-11-10), recorded here once and used by every rebuild of the release; it builds upstream commit 4554c7436049, dated 2026-11-09T03:07:05Z (source.commit_epoch).",
+    "source_date_epoch": 1795644306,
+    "source_date_epoch_provenance": "the time release 2.4.71-CE-ubuntu24.04-r5 was cut (2026-11-25T22:05:06Z), by scripts/rerelease-agenda.py: ReadyStack dates an image by when its release was packaged (owner 2026-11-10), recorded here once and used by every rebuild of the release; it builds upstream commit 4554c7436049, dated 2026-11-09T03:07:05Z (source.commit_epoch).",
     "build_system": "make",
     "builder_image": "ubuntu:24.04",
     "build_packages": [

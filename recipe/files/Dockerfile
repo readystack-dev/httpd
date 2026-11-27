@@ -10,7 +10,7 @@ RUN --mount=type=bind,source=vendored/build-debs,target=/tmp/bdebs \
     { [ -z "$bad" ] || { echo "vendored debs not installed at their vendored version:$bad" >&2; false; }; }
 WORKDIR /src
 COPY vendored/httpd-src/ .
-ARG SOURCE_DATE_EPOCH=1795161067
+ARG SOURCE_DATE_EPOCH=1795644306
 ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
 RUN ./configure --prefix=/opt/httpd --enable-mods-shared=most --disable-ldap --disable-authnz-ldap --enable-mpms-shared=all --with-mpm=event --enable-ssl --enable-http2 --enable-deflate --enable-pie --with-apr=/usr/bin/apr-1-config --with-apr-util=/usr/bin/apu-1-config
 RUN make -j"$(nproc)"
@@ -29,11 +29,11 @@ FROM golang:1.27.3-bookworm@sha256:972b4110ba0f47539a975c31e52c64765e1ff19f2d744
 WORKDIR /probe
 COPY rs-probe.go main.go
 COPY rs-probe.mod go.mod
-ENV CGO_ENABLED=0 GOTOOLCHAIN=local GOFLAGS="-buildvcs=false" GOPROXY=off SOURCE_DATE_EPOCH=1795161067
+ENV CGO_ENABLED=0 GOTOOLCHAIN=local GOFLAGS="-buildvcs=false" GOPROXY=off SOURCE_DATE_EPOCH=1795644306
 RUN go build -trimpath -ldflags='-s -w' -o /rs-probe .
 # the chiselled rootfs (vendored/chisel, cut by Dockerfile.vendor), the service user, the binaries
 FROM ubuntu:24.04@sha256:9c7f200c07e3d4a03e7249d2c16bf66a51120fb876aa2242cf31451412543289 AS rootfs
-ARG SOURCE_DATE_EPOCH=1795161067
+ARG SOURCE_DATE_EPOCH=1795644306
 ADD vendored/chisel/rootfs.tar /rootfs/
 RUN printf 'httpd:x:999:999::/home/httpd:/bin/sh\n' >> /rootfs/etc/passwd && printf 'httpd:x:999:\n' >> /rootfs/etc/group && \
     mkdir -p /rootfs/home/httpd && chown -R 999:999 /rootfs/home/httpd
@@ -56,14 +56,14 @@ RUN --mount=type=bind,source=vendored/chisel,target=/chisel set -eu; \
       { echo "/var/lib/dpkg/status does not list every package of vendored/chisel/packages.tsv" >&2; exit 1; }; \
     rm -rf /rootfs/var/log/dpkg.log /rootfs/var/log/alternatives.log /rootfs/var/log/apt /rootfs/var/cache/ldconfig/aux-cache /rootfs/var/cache/fontconfig
 FROM scratch
-ARG SOURCE_DATE_EPOCH=1795161067
+ARG SOURCE_DATE_EPOCH=1795644306
 COPY --from=rootfs /rootfs/ /
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin PATH=/opt/httpd/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.title="Apache httpd"
 LABEL org.opencontainers.image.source="https://github.com/apache/httpd"
 LABEL org.opencontainers.image.description="Apache httpd 2.4.71 (the Apache HTTP Server) web server, compiled from source, non-root on port 8080"
-LABEL org.opencontainers.image.version="2.4.71-CE-ubuntu24.04-r4"
+LABEL org.opencontainers.image.version="2.4.71-CE-ubuntu24.04-r5"
 LABEL org.opencontainers.image.vendor="ReadyStack.dev"
 LABEL readystack.product="httpd"
 LABEL readystack.edition="CE"
